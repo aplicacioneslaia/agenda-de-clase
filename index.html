@@ -250,7 +250,7 @@ $("#print").onclick=()=>print();
 const hr=new Date().getHours();$("#hola").textContent=hr<13?"¡Buenos días!":hr<20?"¡Buenas tardes!":"¡Buenas noches!";
 const pintar=()=>{horario();deberes();actividades();clia();resumen()};
 const msg=(t,c)=>{const m=$("#msg");m.textContent=t;m.className=c||""};
-const traducir=m=>/invalid login/i.test(m)?"El email o la contraseña no son correctos.":/at least 6/i.test(m)?"La contraseña necesita al menos 6 caracteres.":/already registered/i.test(m)?"Ese email ya tiene cuenta. Pulsa Entrar.":/not confirmed/i.test(m)?"Primero confirma tu email (mira tu correo).":/rate limit/i.test(m)?"Demasiados intentos. Espera un ratito.":"Algo ha fallado: "+m;
+const traducir=m=>/invalid login/i.test(m)?"El email o la contraseña no son correctos.":/at least 6/i.test(m)?"La contraseña necesita al menos 6 caracteres.":/already registered/i.test(m)?"Ese email ya tiene cuenta. Pulsa Entrar.":/not confirmed/i.test(m)?"Primero confirma tu email (mira tu correo).":/email rate limit/i.test(m)?"Supabase no puede mandar más emails ahora mismo (límite por hora). Apaga Confirm email en Supabase y espera un rato. ["+m+"]":/rate limit|too many/i.test(m)?"Demasiados intentos. Espera un ratito. ["+m+"]":"Algo ha fallado: "+m;
 async function bajar(){
  const {data,error}=await SB.from("agenda").select("datos").maybeSingle();
  if(error){estado("⚠️ No se ha podido cargar tu agenda.");return}
