@@ -291,7 +291,7 @@ async function acceso(nuevo){
  const email=$("#l-email").value.trim(),password=$("#l-pass").value;
  if(!email||!password){msg("Escribe tu email y tu contraseña.","err");return}
  msg("Un momento…","ok");
- const r=nuevo?await SB.auth.signUp({email,password}):await SB.auth.signInWithPassword({email,password});
+ const r=nuevo?await SB.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}}):await SB.auth.signInWithPassword({email,password});
  if(r.error){msg(traducir(r.error.message),"err");return}
  if(r.data.session){msg("");$("#l-pass").value="";entrar(r.data.session)}
  else msg("¡Cuenta creada! Te hemos mandado un email: ábrelo, pulsa el enlace y luego vuelve y pulsa Entrar.","ok")}
