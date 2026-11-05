@@ -9,12 +9,12 @@
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 --bg:#fffbdc;--card:#ffffff;--ink:#24402c;--mute:#5d7a63;--line:#d3e8b6;--main:#9fd98a;--main-ink:#1f3d24;
---c0:#ffffff;--c1:#fff1a0;--c2:#c8eeb5;--c3:#f6f9a8;--c4:#aee3c4;--c5:#ffe49a;
+--c0:#ffffff;--c1:#fff1a0;--c2:#c8eeb5;--c3:#f6f9a8;--c4:#aee3c4;--c5:#ffe49a;--c6:#ffc9d9;--c7:#bfe0ff;--c8:#ddccff;--c9:#ffd0a8;--c10:#ffb8b0;--c11:#b8ecf2;
 --examen:#f0b429;--tarea:#6cc070;--trabajo:#b5d44a;--estudio:#4fbf9a}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16261b;--card:#1f3426;--ink:#f4f8dc;--mute:#b5c9a6;--line:#34513b;--main:#b7e08a;--main-ink:#16261b;
---c0:#1f3426;--c1:#5c5a1a;--c2:#2f5a2c;--c3:#4d5a22;--c4:#24584a;--c5:#6a5a1c}}
+--c0:#1f3426;--c1:#5c5a1a;--c2:#2f5a2c;--c3:#4d5a22;--c4:#24584a;--c5:#6a5a1c;--c6:#6a2e45;--c7:#274a6e;--c8:#4a3a72;--c9:#704424;--c10:#6e302c;--c11:#1f5560}}
 :root[data-theme="dark"]{--bg:#16261b;--card:#1f3426;--ink:#f4f8dc;--mute:#b5c9a6;--line:#34513b;--main:#b7e08a;--main-ink:#16261b;
---c0:#1f3426;--c1:#5c5a1a;--c2:#2f5a2c;--c3:#4d5a22;--c4:#24584a;--c5:#6a5a1c}
+--c0:#1f3426;--c1:#5c5a1a;--c2:#2f5a2c;--c3:#4d5a22;--c4:#24584a;--c5:#6a5a1c;--c6:#6a2e45;--c7:#274a6e;--c8:#4a3a72;--c9:#704424;--c10:#6e302c;--c11:#1f5560}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.45 Nunito,system-ui,sans-serif}
@@ -74,7 +74,7 @@ textarea{width:100%;min-height:90px;flex-basis:100%}
 #login,#salir,#estado{display:none!important}
 :root{padding:0}
 body{background:#fff;color:#000;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-#colores,nav,.row,.x,.dot,.btn,#print,.tip,#hoy,.empty{display:none!important}
+#pick,#colores,nav,.row,.x,.dot,.btn,#print,.tip,#hoy,.empty{display:none!important}
 section{display:block!important}
 section#hoy{display:none!important}
 #deberes,#clia{break-before:page}
@@ -95,9 +95,13 @@ header{padding-top:0}
 .sw[aria-pressed=true]{border-color:var(--ink);box-shadow:0 0 0 3px var(--card),0 0 0 5px var(--ink)}
 .modos{display:flex;gap:8px;flex-wrap:wrap}
 .btn.ghost[aria-pressed=true]{background:var(--main);color:var(--main-ink);border-color:var(--main)}
+#pick{position:fixed;z-index:40;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:8px;display:grid;grid-template-columns:repeat(6,34px);gap:6px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+#pick[hidden]{display:none}
+#pick button{width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);background:var(--c);cursor:pointer;padding:0}
+#pick button[aria-pressed=true]{box-shadow:0 0 0 3px var(--card),0 0 0 5px var(--ink)}
 </style>
 <script>
-const PALS=[["verde","Verde",null,"#9fd98a"],["azul","Azul",210,"hsl(210 55% 70%)"],["turquesa","Turquesa",175,"hsl(175 55% 70%)"],["morado","Morado",270,"hsl(270 55% 70%)"],["rosa","Rosa",330,"hsl(330 55% 70%)"],["naranja","Naranja",25,"hsl(25 55% 70%)"]];
+const PALS=[["rojo","Rojo",5,"hsl(5 55% 70%)"],["naranja","Naranja",25,"hsl(25 55% 70%)"],["amarillo","Amarillo",48,"hsl(48 55% 70%)"],["lima","Lima",75,"hsl(75 55% 70%)"],["verde","Verde",null,"#9fd98a"],["menta","Menta",150,"hsl(150 55% 70%)"],["turquesa","Turquesa",175,"hsl(175 55% 70%)"],["celeste","Celeste",195,"hsl(195 55% 70%)"],["azul","Azul",210,"hsl(210 55% 70%)"],["morado","Morado",270,"hsl(270 55% 70%)"],["lila","Lila",295,"hsl(295 55% 70%)"],["rosa","Rosa",330,"hsl(330 55% 70%)"]];
 let TEMA={p:"verde",m:"auto"};
 try{Object.assign(TEMA,JSON.parse(localStorage.getItem("agenda_tema")||"{}"))}catch(e){}
 function aplicarTema(){const r=document.documentElement,P=PALS.find(x=>x[0]==TEMA.p)||PALS[0];
@@ -143,7 +147,7 @@ aplicarTema();
 </section>
 <section id="horario">
  <div class="card"><h2>Mi horario de clase</h2>
- <p class="tip">Toca una casilla y escribe la asignatura. El circulito de la esquina cambia el color. También puedes cambiar las horas.</p>
+ <p class="tip">Toca una casilla y escribe la asignatura. Toca el circulito de la esquina y elige un color. También puedes cambiar las horas.</p>
  <div class="scroll"><table id="tabla"></table></div></div>
 </section>
 <section id="deberes">
@@ -187,6 +191,7 @@ aplicarTema();
 </section>
 <p style="text-align:center"><button class="btn" id="print">🖨️ Imprimir mi agenda entera</button> <button class="btn ghost" id="salir">Cerrar sesión</button><span id="estado"></span></p>
 </main>
+<div id="pick" hidden role="dialog" aria-label="Elegir color"></div>
 <script>
 const $=s=>document.querySelector(s);
 const DIAS=["Lunes","Martes","Miércoles","Jueves","Viernes"];
@@ -229,8 +234,22 @@ $("#tabla").oninput=e=>{const i=e.target;
  if(i.dataset.t!==undefined)S.t[i.dataset.t]=i.value;
  if(i.dataset.k){S.h[i.dataset.k]=Object.assign(S.h[i.dataset.k]||{},{x:i.value})}
  save();resumen()};
+const NC=12,NOM=["Sin color","Amarillo","Verde","Lima","Menta","Naranja claro","Rosa","Azul","Morado","Naranja","Rojo","Celeste"];
+let pickK=null;
+$("#pick").innerHTML=NOM.map((n,i)=>`<button data-n="${i}" style="--c:var(--c${i})" aria-label="${n}" title="${n}"></button>`).join("");
+const cierra=()=>{$("#pick").hidden=true;pickK=null};
 $("#tabla").onclick=e=>{const b=e.target.closest(".dot");if(!b)return;
- const o=S.h[b.dataset.c]=S.h[b.dataset.c]||{};o.c=((o.c||0)+1)%6;save();horario()};
+ if(pickK===b.dataset.c){cierra();return}
+ pickK=b.dataset.c;const cur=(S.h[pickK]||{}).c||0,P=$("#pick");
+ P.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",+x.dataset.n===cur));
+ P.hidden=false;const r=b.getBoundingClientRect(),w=P.offsetWidth,h=P.offsetHeight;
+ P.style.left=Math.max(8,Math.min(r.right-w,innerWidth-w-8))+"px";
+ P.style.top=(r.bottom+6+h>innerHeight?Math.max(8,r.top-h-6):r.bottom+6)+"px"};
+$("#pick").onclick=e=>{const b=e.target.closest("button");if(!b||pickK===null)return;
+ const o=S.h[pickK]=S.h[pickK]||{};o.c=+b.dataset.n;cierra();save();horario()};
+document.addEventListener("click",e=>{if(!e.target.closest("#pick,.dot"))cierra()});
+addEventListener("scroll",cierra,true);addEventListener("resize",cierra);
+addEventListener("keydown",e=>{if(e.key==="Escape")cierra()});
 
 function deberes(){
  const L=S.deb.map((x,i)=>({...x,i})).sort((a,b)=>(a.ok-b.ok)||((a.f||"9")>(b.f||"9")?1:-1));
