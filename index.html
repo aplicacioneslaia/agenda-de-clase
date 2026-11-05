@@ -74,7 +74,7 @@ textarea{width:100%;min-height:90px;flex-basis:100%}
 #login,#salir,#estado{display:none!important}
 :root{padding:0}
 body{background:#fff;color:#000;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-nav,.row,.x,.dot,.btn,#print,.tip,#hoy,.empty{display:none!important}
+#colores,nav,.row,.x,.dot,.btn,#print,.tip,#hoy,.empty{display:none!important}
 section{display:block!important}
 section#hoy{display:none!important}
 #deberes,#clia{break-before:page}
@@ -85,7 +85,27 @@ td input{height:34px}
 header{padding-top:0}
 }
 @media (prefers-reduced-motion:no-preference){.tab{transition:background .15s}}
+/* Paletas de color (el verde es el original y no necesita nada) */
+:root[data-pal]{--bg:hsl(var(--h) 90% 93%);--ink:hsl(var(--h) 35% 18%);--mute:hsl(var(--h) 16% 38%);--line:hsl(var(--h) 45% 82%);--main:hsl(var(--h) 55% 70%);--main-ink:hsl(var(--h) 45% 14%)}
+@media (prefers-color-scheme:dark){:root[data-pal]:not([data-theme="light"]){--bg:hsl(var(--h) 28% 11%);--card:hsl(var(--h) 22% 17%);--c0:hsl(var(--h) 22% 17%);--ink:hsl(var(--h) 60% 94%);--mute:hsl(var(--h) 18% 72%);--line:hsl(var(--h) 22% 29%);--main:hsl(var(--h) 60% 72%);--main-ink:hsl(var(--h) 35% 12%)}}
+:root[data-pal][data-theme="dark"]{--bg:hsl(var(--h) 28% 11%);--card:hsl(var(--h) 22% 17%);--c0:hsl(var(--h) 22% 17%);--ink:hsl(var(--h) 60% 94%);--mute:hsl(var(--h) 18% 72%);--line:hsl(var(--h) 22% 29%);--main:hsl(var(--h) 60% 72%);--main-ink:hsl(var(--h) 35% 12%)}
+#colbtn{margin-top:8px;padding:6px 14px;font-size:.95rem}
+.pal{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0 16px}
+.sw{width:46px;height:46px;border-radius:50%;border:3px solid var(--line);cursor:pointer;padding:0}
+.sw[aria-pressed=true]{border-color:var(--ink);box-shadow:0 0 0 3px var(--card),0 0 0 5px var(--ink)}
+.modos{display:flex;gap:8px;flex-wrap:wrap}
+.btn.ghost[aria-pressed=true]{background:var(--main);color:var(--main-ink);border-color:var(--main)}
 </style>
+<script>
+const PALS=[["verde","Verde",null,"#9fd98a"],["azul","Azul",210,"hsl(210 55% 70%)"],["turquesa","Turquesa",175,"hsl(175 55% 70%)"],["morado","Morado",270,"hsl(270 55% 70%)"],["rosa","Rosa",330,"hsl(330 55% 70%)"],["naranja","Naranja",25,"hsl(25 55% 70%)"]];
+let TEMA={p:"verde",m:"auto"};
+try{Object.assign(TEMA,JSON.parse(localStorage.getItem("agenda_tema")||"{}"))}catch(e){}
+function aplicarTema(){const r=document.documentElement,P=PALS.find(x=>x[0]==TEMA.p)||PALS[0];
+ if(P[2]===null){r.removeAttribute("data-pal");r.style.removeProperty("--h")}else{r.dataset.pal=P[0];r.style.setProperty("--h",P[2])}
+ if(TEMA.m=="auto")r.removeAttribute("data-theme");else r.dataset.theme=TEMA.m=="oscuro"?"dark":"light";
+ try{localStorage.setItem("agenda_tema",JSON.stringify(TEMA))}catch(e){}}
+aplicarTema();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script></head>
 <body>
 <div id="login"><div class="card">
@@ -96,7 +116,8 @@ header{padding-top:0}
 <div class="btns"><button class="btn" id="l-in">Entrar</button><button class="btn ghost" id="l-up">Crear mi cuenta</button></div>
 <p id="msg" role="status"></p>
 </div></div>
-<header><div><h1>Mi agenda 📒</h1><p>Todo lo del cole y mis cosas, en un solo sitio.</p></div>
+<header><div><h1>Mi agenda 📒</h1><p>Todo lo del cole y mis cosas, en un solo sitio.</p>
+<button class="btn ghost" id="colbtn" aria-expanded="false" aria-controls="colores">🎨 Colores</button></div>
 <svg class="art" viewBox="0 0 160 120" role="img" aria-label="Cuaderno, lápiz y globo de diálogo" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
 <polygon points="30,8 33,16 42,16 35,21 38,30 30,25 22,30 25,21 18,16 27,16" fill="var(--c1)"/>
 <rect x="14" y="44" width="86" height="66" rx="8" fill="var(--c2)"/>
@@ -109,6 +130,12 @@ header{padding-top:0}
 </svg></header>
 <nav role="tablist" id="tabs"></nav>
 <main>
+<div class="card" id="colores" hidden>
+ <h2>🎨 Mis colores</h2>
+ <h3>Elige un color</h3><div class="pal" id="pal"></div>
+ <h3>Claro u oscuro</h3>
+ <div class="modos" id="modos"><button class="btn ghost" data-m="auto">🌓 Automático</button><button class="btn ghost" data-m="claro">☀️ Claro</button><button class="btn ghost" data-m="oscuro">🌙 Oscuro</button></div>
+</div>
 <section id="hoy">
  <div class="card hero"><h2 id="hola">¡Hola!</h2><p id="resumen"></p></div>
  <div class="card"><h2>Lo próximo</h2><div id="proximo"></div></div>
@@ -264,7 +291,7 @@ async function acceso(nuevo){
  const email=$("#l-email").value.trim(),password=$("#l-pass").value;
  if(!email||!password){msg("Escribe tu email y tu contraseña.","err");return}
  msg("Un momento…","ok");
- const r=nuevo?await SB.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}}):await SB.auth.signInWithPassword({email,password});
+ const r=nuevo?await SB.auth.signUp({email,password}):await SB.auth.signInWithPassword({email,password});
  if(r.error){msg(traducir(r.error.message),"err");return}
  if(r.data.session){msg("");$("#l-pass").value="";entrar(r.data.session)}
  else msg("¡Cuenta creada! Te hemos mandado un email: ábrelo, pulsa el enlace y luego vuelve y pulsa Entrar.","ok")}
@@ -279,6 +306,14 @@ if(window.supabase){
  SB.auth.getSession().then(({data})=>{if(data.session)entrar(data.session)});
  document.addEventListener("visibilitychange",()=>{if(!document.hidden&&USER)bajar()});
 }else msg("No se ha podido cargar. ¿Tienes internet?","err");
+// ---- Colores ----
+function pintarTema(){
+ $("#pal").innerHTML=PALS.map(x=>`<button class="sw" data-p="${x[0]}" style="background:${x[3]}" aria-label="${x[1]}" aria-pressed="${x[0]==TEMA.p}"></button>`).join("");
+ document.querySelectorAll("#modos .btn").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m==TEMA.m))}
+$("#colbtn").onclick=()=>{const c=$("#colores"),abrir=c.hidden;c.hidden=!abrir;$("#colbtn").setAttribute("aria-expanded",abrir)};
+$("#pal").onclick=e=>{const b=e.target.closest(".sw");if(!b)return;TEMA.p=b.dataset.p;aplicarTema();pintarTema()};
+$("#modos").onclick=e=>{const b=e.target.closest(".btn");if(!b)return;TEMA.m=b.dataset.m;aplicarTema();pintarTema()};
+pintarTema();
 horario();deberes();actividades();clia();
 go(TABS.some(t=>t[0]==location.hash.slice(1))?location.hash.slice(1):"hoy");
 </script></body></html>
